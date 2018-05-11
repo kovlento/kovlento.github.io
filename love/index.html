@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Love</title>
+    <meta charset="utf-8">
+    <link rel="apple-touch-icon" href="images/icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <style>
+    * { margin: 0; }
+    body {
+      -webkit-text-size-adjust: none;
+      font-family: Baskerville, Helvetica, Arial, sans-serif;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      -webkit-perspective: 1000;
+    }
+    #flipper {
+      width: 100%;
+      height: 100%;
+    	-webkit-transition: 0.5s;
+    	-webkit-transform-style: preserve-3d;
+    }
+    #main {
+      display: table;
+      background: #333;
+      text-align: center;
+      position: relative;
+      -webkit-transform: rotateY(0deg);
+    }
+    #text {
+      margin: 0;
+      color: #19e5de;
+      overflow: hidden;
+      white-space: nowrap;
+      display: table-cell;
+      vertical-align: middle;
+    }
+    #about {
+      color: #333;
+      background: #f8f8f8;
+      margin-bottom: 10px;
+      -webkit-transform: rotateY(180deg);
+    }
+    #main, #about {
+    	top: 0;
+    	left: 0;
+      width: 100%;
+      height: 100%;
+    	position: absolute;
+      -webkit-backface-visibility: hidden;
+    }
+    .header { 
+      margin: 15px 0 5px 0;
+      font-size: 30px;
+      text-align: center;
+    }
+    .world {
+      text-align: center;
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+    a {
+      color: #08c;
+      text-decoration: none;
+    }
+    #qrcode {
+      width: 280px;
+      margin: auto;
+      display: block;
+    }
+    .heart {
+        margin: 100px auto;
+        width: 200px;
+        height: 200px;
+        position: relative;
+        animation-name: shake;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+    }
+    .heart div {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: red;
+        animation-name: shadow;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+    }
+    .topLeft,
+    .topRight {
+        border-radius: 100px 100px 0 0;
+    }
+
+    .topLeft {
+        transform: translate(-70px, 0) rotate(-45deg);
+    }
+
+    .topRight {
+        transform: translate(70px, 0) rotate(45deg);
+    }
+
+    .bottom {
+        transform: translate(0, 84px) rotate(45deg) scale(.9, .9);
+    }
+    /* 定义动画 */
+
+    @keyframes shake {
+        from {
+              transform: scale(.9, .9);
+        }
+        to {
+              transform: scale(1.1, 1.1);
+        }
+    }
+
+    @keyframes shadow {
+        from {}
+        to {
+              box-shadow: 0px 0px 50px red;
+        }
+    }
+    </style>
+  </head>
+<body>
+  <div id="container">
+    <div id="flipper">
+      <div id="main">
+        <h1 id="text" contenteditable="true"></h1>
+      </div>
+      <div id="about">
+        <h2 class="header">TheLove</h2>
+        <div class="heart">
+          <div class='topLeft'></div>
+          <div class='topRight'></div>
+          <div class='bottom'></div>
+      </div>
+      </div>
+    </div>
+  </div>
+<script src="javascripts/shake.js"></script>
+<script src="javascripts/jquery.js"></script>
+<script src="javascripts/jquery.touch.js"></script>
+<script type="text/javascript">
+$text = $('#text');
+$container = $('#container');
+$flipper = $('#flipper');
+
+color = '#ED5BF7';
+colors = ['#46AC74','#B2635F','#19CAAD','#8CC7B5','#A0EEE1','#BEE7E9','#BEEDC7','#F4606C','#BEE3DB','#E7C564','#F83538', '#FF4400','#19E5DE', '#FFC0CB','#1CF49A', '#ED5BF7', '#F9F649', '#54EC7E', '#CC342D', '#2FAEFF'];
+
+function setText() {
+  if (localStorage) {
+    $text.text(localStorage.getItem('text') || 'ILoveYou');
+  }
+}
+
+function setColor() {
+  if (localStorage) {
+    $text.css('color', localStorage.getItem('color') || color);
+  }
+}
+
+fontSize = 0;
+function adjustFontSize() {
+  var minFontSize = 100
+  var maxFontSize = window.innerHeight - 40;
+  fontSize = maxFontSize;
+  $text.css('font-size', fontSize);
+  if ($text.text().length < 2) return;
+  var innerWidth = window.innerWidth;
+  
+  var timer = setInterval(function() {
+    if ($text.width() > innerWidth) {
+      fontSize -= 10;
+      $text.css('font-size', fontSize);
+    } else {
+      clearInterval(timer);
+    }
+  }, 10);
+}
+
+setText();
+setColor();
+adjustFontSize();
+
+$text.on('keydown', function(e) {
+  console.log('event:keyup', 'keyCode', e.keyCode, 'width', $(this).width(), 'height', $(this).height());
+  var keyCode = e.keyCode;
+  if (keyCode === 32 || keyCode === 13) return false; // return if Space or Enter is pressed
+    
+  var innerWidth = window.innerWidth;
+  var maxFontSize = window.innerHeight - 40;
+  
+  if (keyCode === 8) {  // delete is pressed
+    var timer = setInterval(function() {
+      if ($text.width() <= innerWidth) {
+        if (fontSize < maxFontSize) {
+          fontSize += 10;
+          $text.css('font-size', fontSize);
+        }
+      } else {
+        fontSize -= 10;
+        $text.css('font-size', fontSize);
+        clearInterval(timer);
+      }
+    }, 10);
+  } else {
+    var timer = setInterval(function() {
+      if ($text.width() > innerWidth) {
+        fontSize -= 10;
+        $text.css('font-size', fontSize);
+      } else {
+        clearInterval(timer);
+      }
+    }, 10);
+  }
+}).on('keyup', function(e) {
+  if (localStorage) localStorage.setItem('text', $text.text());
+});
+
+$(window).on(navigator.standalone ? 'orientationchange' : 'resize', function() {
+  adjustFontSize();
+}).on('shake', function() {
+  color = colors[Math.floor(Math.random() * colors.length)];
+  if (localStorage) localStorage.setItem('color', color);
+  setColor();
+});
+
+degree = 0;
+$flipper.css('-webkit-transform', 0);
+$container.on('swiperight', function() {
+  degree += 180;
+  $flipper.css('-webkit-transform', 'rotateY(' + degree + 'deg)');
+}).on('swipeleft', function() {
+  degree -= 180;
+  $flipper.css('-webkit-transform', 'rotateY(' + degree + 'deg)');
+});
+
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-16520159-3', 'auto');
+  ga('send', 'pageview');
+</script>
+</body>
+</html>
